@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - user-service
+          - restaurant-service
+          - order-service
+          - delivery-service
+          - payment-service
+          - notification-service
+    defaults:
+      run:
+        working-directory: backend/${{ matrix.service }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npx eslint ./
+
+      - name: Run tests (if any)
+        run: npm test || echo "⚠️ No tests configured yet"

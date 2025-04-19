@@ -1,0 +1,27 @@
+services:
+  mongo:
+    image: mongo:6.0
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+  user-service:
+    build: ./backend/user-service
+    env_file: ./backend/.env.example
+    depends_on:
+      - mongo
+    ports:
+      - "3001:3001"
+
+  api-gateway:
+    build: ./backend/api-gateway
+    env_file: ./backend/.env.example
+    depends_on:
+      - user-service
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongo-data:
