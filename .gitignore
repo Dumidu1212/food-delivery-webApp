@@ -1,0 +1,49 @@
+# Node.js dependencies
+**/node_modules/
+**/npm-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/**/.env
+web-app/.env
+
+# Logs
+logs/
+*.log
+**/logs/
+**/*.log
+
+# Build / output
+dist/
+build/
+coverage/
+tmp/
+temp/
+
+# Docker
+**/Dockerfile*
+**/docker-compose*.yml
+**/.dockerignore
+
+# Kubernetes
+infra/k8s/*.local.yaml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Misc
+*.swp
+*.swn

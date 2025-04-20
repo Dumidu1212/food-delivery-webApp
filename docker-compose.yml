@@ -1,27 +1,154 @@
+version: '3.8'
+
 services:
+  # 1) MongoDB
   mongo:
     image: mongo:6.0
-    restart: always
-    volumes:
-      - mongo-data:/data/db
+    container_name: ds-assignment-mongo
+    restart: unless-stopped
     ports:
       - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
 
-  user-service:
-    build: ./backend/user-service
-    env_file: ./backend/.env.example
+  # 2) RabbitMQ (for async notifications, optional)
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ds-assignment-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # 3) API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PORT: ${API_GATEWAY_PORT}
+    container_name: ds-assignment-api-gateway
+    env_file:
+      - .env
+    environment:
+      - PORT=${API_GATEWAY_PORT}
+      - USER_SERVICE_URL=http://user-service:${USER_SERVICE_PORT}
+      - RESTAURANT_SERVICE_URL=http://restaurant-service:${RESTAURANT_SERVICE_PORT}
+      - ORDER_SERVICE_URL=http://order-service:${ORDER_SERVICE_PORT}
+      - DELIVERY_SERVICE_URL=http://delivery-service:${DELIVERY_SERVICE_PORT}
+      - PAYMENT_SERVICE_URL=http://payment-service:${PAYMENT_SERVICE_PORT}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:${NOTIFICATION_SERVICE_PORT}
+    ports:
+      - "${API_GATEWAY_PORT}:3000"
     depends_on:
       - mongo
-    ports:
-      - "3001:3001"
-
-  api-gateway:
-    build: ./backend/api-gateway
-    env_file: ./backend/.env.example
-    depends_on:
       - user-service
+      - restaurant-service
+      - order-service
+      - delivery-service
+      - payment-service
+      - notification-service
+
+  # 4) User Service
+  user-service:
+    build:
+      context: .   # the repo root
+      dockerfile: backend/user-service/Dockerfile
+    container_name: ds-assignment-user
     ports:
-      - "3000:3000"
+      - "${USER_SERVICE_PORT}:3001"
+    env_file:
+      - .env
+    environment:
+      - PORT=${USER_SERVICE_PORT}
+    depends_on:
+      - mongo
+
+  # 5) Restaurant Service
+  restaurant-service:
+    build:
+      context: ./backend/restaurant-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PORT: ${RESTAURANT_SERVICE_PORT}
+    container_name: ds-assignment-restaurant
+    env_file:
+      - .env
+    environment:
+      - PORT=${RESTAURANT_SERVICE_PORT}
+    ports:
+      - "${RESTAURANT_SERVICE_PORT}:3002"
+    depends_on:
+      - mongo
+
+  # 6) Order Service
+  order-service:
+    build:
+      context: ./backend/order-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PORT: ${ORDER_SERVICE_PORT}
+    container_name: ds-assignment-order
+    env_file:
+      - .env
+    environment:
+      - PORT=${ORDER_SERVICE_PORT}
+    ports:
+      - "${ORDER_SERVICE_PORT}:3004"
+    depends_on:
+      - mongo
+
+  # 7) Delivery Service
+  delivery-service:
+    build:
+      context: ./backend/delivery-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PORT: ${DELIVERY_SERVICE_PORT}
+    container_name: ds-assignment-delivery
+    env_file:
+      - .env
+    environment:
+      - PORT=${DELIVERY_SERVICE_PORT}
+    ports:
+      - "${DELIVERY_SERVICE_PORT}:3005"
+    depends_on:
+      - mongo
+
+  # 8) Payment Service
+  payment-service:
+    build:
+      context: ./backend/payment-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PORT: ${PAYMENT_SERVICE_PORT}
+    container_name: ds-assignment-payment
+    env_file:
+      - .env
+    environment:
+      - PORT=${PAYMENT_SERVICE_PORT}
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:3003"
+    depends_on:
+      - mongo
+
+  # 9) Notification Service
+  notification-service:
+    build:
+      context: ./backend/notification-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
+    container_name: ds-assignment-notification
+    env_file:
+      - .env
+    environment:
+      - PORT=${NOTIFICATION_SERVICE_PORT}
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:3006"
+    depends_on:
+      - mongo
+      - rabbitmq
 
 volumes:
   mongo-data:
