@@ -1,6 +1,6 @@
 import User from '../models/User.js';
 import { generateToken } from '../services/authService.js';
-import { info, error } from '../../../common/utils/logger.js';
+import { info, error } from '../utils/logger.js'
 
 export const register = async (req, res, next) => {
   try {

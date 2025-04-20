@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   # 1) MongoDB
@@ -52,8 +51,8 @@ services:
   # 4) User Service
   user-service:
     build:
-      context: .   # the repo root
-      dockerfile: backend/user-service/Dockerfile
+      context: ./backend/user-service
+      dockerfile: Dockerfile
     container_name: ds-assignment-user
     ports:
       - "${USER_SERVICE_PORT}:3001"
@@ -72,12 +71,12 @@ services:
       args:
         SERVICE_PORT: ${RESTAURANT_SERVICE_PORT}
     container_name: ds-assignment-restaurant
+    ports:
+      - "${RESTAURANT_SERVICE_PORT}:3002"
     env_file:
       - .env
     environment:
       - PORT=${RESTAURANT_SERVICE_PORT}
-    ports:
-      - "${RESTAURANT_SERVICE_PORT}:3002"
     depends_on:
       - mongo
 
