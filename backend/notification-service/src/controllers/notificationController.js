@@ -99,3 +99,26 @@ export async function markAsRead(req, res, next) {
     next(err);
   }
 }
+
+/**
+ * DELETE /api/notifications/:id
+ * Deletes a single notification belonging to the authenticated user.
+ */
+export async function deleteNotification(req, res, next) {
+  try {
+    const deleted = await Notification.findOneAndDelete({
+      _id: req.params.id,
+      recipient: req.user.id
+    });
+
+    if (!deleted) {
+      return res.sendStatus(NOT_FOUND);
+    }
+
+    info(`Deleted notification ${req.params.id} for user ${req.user.id}`);
+    return res.sendStatus(NO_CONTENT);
+  } catch (err) {
+    error('deleteNotification error:', err);
+    return next(err);
+  }
+}
