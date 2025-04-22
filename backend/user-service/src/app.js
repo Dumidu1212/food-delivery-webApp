@@ -1,29 +1,41 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes.js';
+// backend/user-service/src/app.js
+import express from 'express'
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import userRoutes  from './routes/userRoutes.js'
+import adminRoutes from './routes/adminRoutes.js'
+import logger, { errorHandler } from './utils/logger.js'
 
-dotenv.config();
+const { info, error } = logger
 
-const app = express();
-const PORT = process.env.PORT || 3001;
 
-app.use(express.json());
+dotenv.config()
+
+const app = express()
+app.use(express.json())
 
 // Health‑check
-app.get('/health', (_req, res) => res.sendStatus(200));
+app.get('/health', (_req, res) => res.sendStatus(200))
 
-// Mount your user routes
-app.use('/api/users', userRoutes);
+// Public + auth routes
+app.use('/api/users', userRoutes)
 
-// Connect to Mongo & start
+// Admin‑only routes
+app.use('/api/users/admin', adminRoutes)
+
+app.use(errorHandler);
+
+// Connect to Mongo and start
 mongoose
-  .connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log('🗄️  Connected to MongoDB');
-    app.listen(PORT, () => console.log(`👤 User Service listening on port ${PORT}`));
+    info('🗄️  Connected to MongoDB')
+    const PORT = process.env.PORT || 3001
+    app.listen(PORT, () =>
+      info(`👤 User Service listening on port ${PORT}`)
+    )
   })
   .catch(err => {
-    console.error('❌ Mongo connection error:', err);
-    process.exit(1);
-  });
+    error('❌ Mongo connection error:', err)
+    process.exit(1)
+  })

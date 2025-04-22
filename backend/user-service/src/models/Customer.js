@@ -1,21 +1,21 @@
 // backend/user-service/src/models/Customer.js
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
-const customerSchema = new mongoose.Schema({
-  userId:              { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+const { Schema, model, Types } = mongoose;
+
+const customerSchema = new Schema({
+  userId:              { type: Types.ObjectId, ref: 'User', required: true },
   name:                { type: String, required: true },
   address:             { type: String },
-  phone:               { type: String, sparse: true },
+  phone:               { type: String },
   email:               { type: String, required: true, unique: true },
-  favoriteRestaurants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" }],
-  orderHistory: [
-    {
-      orderId:     { type: mongoose.Schema.Types.ObjectId, ref: "Order" },
-      date:        { type: Date, default: Date.now },
-      totalAmount: { type: Number, required: true },
-    }
-  ],
-  status:              { type: String, enum: ["Active", "Inactive"], default: "Active" },
+  favoriteRestaurants: [{ type: Types.ObjectId, ref: 'Restaurant' }],
+  orderHistory: [{
+    orderId:     { type: Types.ObjectId, ref: 'Order' },
+    date:        { type: Date, default: Date.now },
+    totalAmount: { type: Number, required: true },
+  }],
+  status:              { type: String, enum: ['Active','Inactive'], default: 'Active' },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Customer", customerSchema);
+export default model('Customer', customerSchema);

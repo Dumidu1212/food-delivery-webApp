@@ -139,6 +139,7 @@ services:
       args:
         SERVICE_PORT: ${NOTIFICATION_SERVICE_PORT}
     container_name: ds-assignment-notification
+    # load both the root .env and your notification‑service .env
     env_file:
       - .env
     environment:
@@ -148,6 +149,7 @@ services:
     depends_on:
       - mongo
       - rabbitmq
+
 
 volumes:
   mongo-data:

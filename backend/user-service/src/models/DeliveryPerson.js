@@ -1,28 +1,30 @@
 // backend/user-service/src/models/DeliveryPerson.js
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
-const deliveryPersonSchema = new mongoose.Schema({
-  userId:        { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+const { Schema, model, Types } = mongoose;
+
+const deliveryPersonSchema = new Schema({
+  userId:        { type: Types.ObjectId, ref: 'User', required: true },
   name:          { type: String, required: true },
   address:       { type: String },
-  location:      {
-    type: {
-      type: String,
-      enum: ["Point"],
-      default: "Point"
-    },
-    coordinates: [Number]
+  location: {
+    type: { type: String, enum: ['Point'], default: 'Point' },
+    coordinates: { type: [Number] }
   },
   email:         { type: String, required: true, unique: true },
   phone:         { type: String },
   vehicleNumber: { type: String, unique: true },
   license:       { type: String, unique: true },
-  gender:        { type: String, enum: ["Male", "Female"], default: "Male" },
+  gender:        { type: String, enum: ['Male','Female'], default: 'Male' },
   isAvailable:   { type: Boolean, default: true },
-  status:        { type: String, enum: ["Active", "Inactive", "Pending"], default: "Pending" },
+  status:        { 
+    type: String, 
+    enum: ['Pending','Active','Inactive'], 
+    default: 'Pending' 
+  },
 }, { timestamps: true });
 
-// Enable geolocation queries
-deliveryPersonSchema.index({ location: "2dsphere" });
+// enable geo‑queries
+deliveryPersonSchema.index({ location: '2dsphere' });
 
-module.exports = mongoose.model("DeliveryPerson", deliveryPersonSchema);
+export default model('DeliveryPerson', deliveryPersonSchema);
