@@ -25,9 +25,9 @@ tmp/
 temp/
 
 # Docker
-**/Dockerfile*
-**/docker-compose*.yml
-**/.dockerignore
+# **/Dockerfile*
+# **/docker-compose*.yml
+# **/.dockerignore
 
 # Kubernetes
 infra/k8s/*.local.yaml

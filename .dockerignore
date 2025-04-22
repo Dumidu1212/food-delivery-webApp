@@ -1,0 +1,2 @@
+# Ignore all host node_modules directories so Docker won't COPY them
+**/node_modules
